@@ -139,6 +139,12 @@ char* read_line() {
             }
             continue;
         } 
+        
+        // CTRL-L
+        if (c == '\x0C') {
+            printf("\033[2J\033[1;1H");
+            return NULL;
+        }
 
         if (c == '\x1B') {
             char seq[3];
@@ -226,13 +232,19 @@ char* read_line() {
 }
 
 char** split_line(char* line) {
+    if (line == NULL) {
+        return NULL;
+    }
+
+
     int bufsize = TOK_BUFSIZE;
     int position = 0;
     char** tokens = malloc(bufsize * sizeof(char*));
     char* token;
 
     check_malloc(tokens);
-
+    
+    //TODO use reentrant version strtok_r instead.
     token = strtok(line, TOK_DELIM);
     while (token != NULL) {
         tokens[position] = token;
@@ -274,7 +286,7 @@ int launch(char** args) {
 }
 
 int execute(char** args) {
-    if (args[0] == NULL) {
+    if (args == NULL || args[0] == NULL) {
         return 1;
     }
 
@@ -295,7 +307,7 @@ void main_loop() {
     do {
         print_prompt();
         line = read_line();
-        printf("\nInput: %s\n", line);
+        //printf("\nInput: %s\n", line);
         args = split_line(line);
         status = execute(args);
 
