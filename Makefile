@@ -1,2 +1,2 @@
 jsh: jsh.c
-	gcc -o jsh jsh.c
+	gcc -g -o jsh jsh.c

@@ -4,7 +4,8 @@
 #include <unistd.h>
 #include <wordexp.h>
 #include <termios.h>
-
+#include <sys/types.h>
+#include <wait.h>
 
 #define RL_BUFSIZE 1024
 #define TOK_BUFSIZE 64
@@ -127,23 +128,27 @@ char* read_line() {
     struct termios orig_termios;
     check_malloc(buffer);
 
+    enable_raw_mode(&orig_termios);
+    
     while (1) {
-
-        enable_raw_mode(&orig_termios);
-        
         c = getchar();
+
+        if (c == '\x04') {
+            if (len == 0) {
+                exit(EXIT_SUCCESS);
+            }
+            continue;
+        } 
 
         if (c == '\x1B') {
             char seq[3];
-            /*if (read(STDIN_FILENO, &seq[0], 1) == 0) {*/
-            /*    continue;*/
-            /*}*/
-            /**/
-            /*if (read(STDIN_FILENO, &seq[1], 1) == 0) {*/
-            /*    continue;*/
-            /*}*/
             
             seq[0] = getchar();
+
+            if (seq[0] == 'D') {
+                exit(EXIT_SUCCESS);
+            }
+
             seq[1] = getchar();
 
             if (seq[0] == '[') {
@@ -164,27 +169,24 @@ char* read_line() {
             continue;
         }
 
-        if (c == '\x7F' && position > 0) {
+        if (c == '\x7F') {
+            if (position == 0) {
+                continue;
+            }
+
             position -= 1;
             len -= 1;
             memmove(&buffer[position], &buffer[position + 1], len - position);
             printf("\b \b");
             
-            printf("%s ", &buffer[position]);
+            fwrite(&buffer[position], len - position, 1, stdout);
+            printf(" ");
 
             for (int i = len + 1; i > position; i--) {
                 printf("\b");
             }
             continue;
         }
-
-
-        if (c == EOF) {
-            if (position == 0) {
-                exit(EXIT_SUCCESS);
-            }
-            continue;
-        } 
 
         if (c == '\n') {
             buffer[len] = '\0';
@@ -211,19 +213,16 @@ char* read_line() {
             for (int i = len; i > position; i--) {
                 printf("\b");
             }
-
-
         }
 
-        
         if (len >= bufsize) {
             bufsize += RL_BUFSIZE;
             buffer = realloc(buffer, bufsize * sizeof(char));
             check_malloc(buffer);
         }
 
-        disable_raw_mode(&orig_termios);
     }
+    disable_raw_mode(&orig_termios);
 }
 
 char** split_line(char* line) {
@@ -284,12 +283,8 @@ int execute(char** args) {
             return (*bi_func[i])(args);
         }
     }
-
     return launch(args);
 }
-
-
-
 
 
 void main_loop() {
@@ -297,19 +292,16 @@ void main_loop() {
     char** args;
     int status;
 
-
     do {
-        //printf("\n");
         print_prompt();
         line = read_line();
-        printf("Input: %s\n", line);
+        printf("\nInput: %s\n", line);
         args = split_line(line);
         status = execute(args);
 
         free(line);
         free(args);
     } while (status);
-
 }
 
 
