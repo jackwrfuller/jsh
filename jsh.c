@@ -132,7 +132,8 @@ char* read_line() {
     
     while (1) {
         c = getchar();
-
+        //printf("%i\n", c);    
+        // CTRL-D, which is sent as 0x04 in raw mode.
         if (c == '\x04') {
             if (len == 0) {
                 exit(EXIT_SUCCESS);
@@ -140,21 +141,17 @@ char* read_line() {
             continue;
         } 
         
-        // CTRL-L
+        // CTRL-L, which is sent as 0x0C in raw mode.
         if (c == '\x0C') {
             printf("\033[2J\033[1;1H");
             return NULL;
         }
-
+        
+        // Escaped characters, such as left and right arrows.
         if (c == '\x1B') {
             char seq[3];
             
             seq[0] = getchar();
-
-            if (seq[0] == 'D') {
-                exit(EXIT_SUCCESS);
-            }
-
             seq[1] = getchar();
 
             if (seq[0] == '[') {
@@ -170,11 +167,30 @@ char* read_line() {
                         printf("%c", buffer[position]);
                         position += 1;
                     }
+                } else if (seq[1] == '3') {
+                    seq[2] = getchar();
+                    // DEL key was pressed
+                    if (seq[2] == '~') {
+                        if (position == len) {
+                            continue;
+                        }
+                        len -= 1;
+                        printf(" \b");
+
+                        memmove(&buffer[position], &buffer[position + 1], len - position);
+
+                        fwrite(&buffer[position], len - position, 1, stdout);
+                        printf(" ");
+                        for (int i = len + 1; i > position; i--) {
+                            printf("\b");
+                        }
+                    }
                 }
             }
             continue;
         }
-
+        
+        // Backspace, sent 
         if (c == '\x7F') {
             if (position == 0) {
                 continue;
