@@ -187,7 +187,7 @@ char* read_line() {
         } 
 
         if (c == '\n') {
-            buffer[position] = '\0';
+            buffer[len] = '\0';
             printf("\n");
             return buffer;
         }
