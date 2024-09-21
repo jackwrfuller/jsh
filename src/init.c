@@ -8,6 +8,10 @@
 
 #include "../include/jsh.h"
 
+int shell_terminal;
+int shell_is_interactive;
+pid_t shell_pgid;
+struct termios shell_tmodes;
 /* 
  * Make sure the shell is runnning interactively as the
  * foreground job before proceeding.
