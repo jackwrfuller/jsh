@@ -7,6 +7,8 @@
 #include <sys/types.h>
 #include <wait.h>
 
+#include "../include/jsh.h"
+
 #define RL_BUFSIZE 1024
 #define TOK_BUFSIZE 64
 #define TOK_DELIM " \t\r\n\a"
@@ -16,6 +18,8 @@ int bi_cd(char** args);
 int bi_help(char** args);
 int bi_exit(char** args);
 int bi_clear(char** args);
+
+job* first_job = NULL;
 
 char* bi_list[] = {
     "cd", 
@@ -334,7 +338,8 @@ void main_loop() {
 
 
 int main(int argc, char* argv[]) {
-    
+   
+    init();
     main_loop();
 
     return EXIT_SUCCESS;
