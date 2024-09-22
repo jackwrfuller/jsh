@@ -6,6 +6,7 @@
 #include <termios.h>
 #include <sys/types.h>
 #include <wait.h>
+#include <pwd.h>
 
 #include "../include/jsh.h"
 
@@ -114,10 +115,13 @@ void disable_raw_mode(struct termios* orig_termios) {
 
 
 void print_prompt() {
-    char username[64];
+    struct passwd* pass;
+    char* username;
     char hostname[64]; 
     
-    getlogin_r(username, 64);
+    pass = getpwuid(getuid());
+    username = pass->pw_name;
+
     gethostname(hostname, 64);
     
     printf("%s@%s > ", username, hostname);
