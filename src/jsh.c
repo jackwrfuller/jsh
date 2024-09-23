@@ -9,10 +9,6 @@
 
 #include "../include/jsh.h"
 
-#define RL_BUFSIZE 1024
-#define TOK_BUFSIZE 64
-#define TOK_DELIM " \t\r\n\a"
-
 /* Forward declarations */
 int bi_cd(char** args);
 int bi_help(char** args);
@@ -251,36 +247,36 @@ char* read_line() {
     disable_raw_mode(&orig_termios);
 }
 
-char** split_line(char* line) {
-    if (line == NULL) {
-        return NULL;
-    }
-
-
-    int bufsize = TOK_BUFSIZE;
-    int position = 0;
-    char** tokens = malloc(bufsize * sizeof(char*));
-    char* token;
-
-    check_malloc(tokens);
-    
-    //TODO use reentrant version strtok_r instead.
-    token = strtok(line, TOK_DELIM);
-    while (token != NULL) {
-        tokens[position] = token;
-        position += 1;
-
-        if (position >= bufsize) {
-            bufsize += TOK_BUFSIZE;
-            tokens = realloc(tokens, bufsize * sizeof(char*));
-            check_malloc(tokens);
-        }
-
-        token = strtok(NULL, TOK_DELIM);
-    }
-    tokens[position] = NULL;
-    return tokens;
-}
+/*char** split_line(char* line) {*/
+/*    if (line == NULL) {*/
+/*        return NULL;*/
+/*    }*/
+/**/
+/**/
+/*    int bufsize = TOK_BUFSIZE;*/
+/*    int position = 0;*/
+/*    char** tokens = malloc(bufsize * sizeof(char*));*/
+/*    char* token;*/
+/**/
+/*    check_malloc(tokens);*/
+/**/
+/*    //TODO use reentrant version strtok_r instead.*/
+/*    token = strtok(line, TOK_DELIM);*/
+/*    while (token != NULL) {*/
+/*        tokens[position] = token;*/
+/*        position += 1;*/
+/**/
+/*        if (position >= bufsize) {*/
+/*            bufsize += TOK_BUFSIZE;*/
+/*            tokens = realloc(tokens, bufsize * sizeof(char*));*/
+/*            check_malloc(tokens);*/
+/*        }*/
+/**/
+/*        token = strtok(NULL, TOK_DELIM);*/
+/*    }*/
+/*    tokens[position] = NULL;*/
+/*    return tokens;*/
+/*}*/
 
 int launch(char** args) {
     pid_t pid, wpid;
@@ -319,20 +315,36 @@ int execute(char** args) {
 }
 
 
-void main_loop() {
+/*void main_loop_original() {*/
+/*    char* line;*/
+/*    char** args;*/
+/*    int status;*/
+/**/
+/*    do {*/
+/*        print_prompt();*/
+/*        line = read_line();*/
+/*        //printf("\nInput: %s\n", line);*/
+/*        args = split_line(line);*/
+/*        status = execute(args);*/
+/**/
+/*        free(line);*/
+/*        free(args);*/
+/*    } while (status);*/
+/*}*/
+
+void main_loop_new() {
     char* line;
-    char** args;
+    job* job;
     int status;
 
     do {
         print_prompt();
         line = read_line();
-        //printf("\nInput: %s\n", line);
-        args = split_line(line);
-        status = execute(args);
+        job = parse_line(line);
+        launch_job(job, IN_FOREGROUND);
 
         free(line);
-        free(args);
+        free_job(job);
     } while (status);
 }
 
@@ -340,7 +352,7 @@ void main_loop() {
 int main(int argc, char* argv[]) {
    
     init();
-    main_loop();
+    main_loop_new();
 
     return EXIT_SUCCESS;
 }

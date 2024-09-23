@@ -1,8 +1,6 @@
 #include "../include/jsh.h"
 
 
-extern job* first_job;
-
 /* Find active job with given pgid */
 job* find_active_job(pid_t pgid) {
     job* j;
@@ -16,7 +14,7 @@ job* find_active_job(pid_t pgid) {
 }
 
 /* Return true if all processes in a job have stopped or completed */
-int job_is_finished(job* j) {
+int job_is_stopped(job* j) {
     process* p;
 
     for (p = j->first_process; p; p = p->next) {
