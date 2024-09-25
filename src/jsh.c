@@ -76,7 +76,8 @@ int bi_help(char** args) {
 
 
 int bi_exit(char** args) {
-    return 0;
+    exit(0);
+    //return 0;
 }
 
 int bi_clear(char** args) {
@@ -91,7 +92,13 @@ void check_malloc(void* ptr) {
     }
 }
 
-
+void check_realloc(void* res, void* ptr) {
+    if (ptr == NULL) {
+        free(ptr);
+        fprintf(stderr, "jsh: allocation error\n");
+        exit(EXIT_FAILURE);
+    }
+}
 
 void enable_raw_mode(struct termios* orig_termios) {
     struct termios raw;
@@ -127,9 +134,10 @@ char* read_line() {
     int bufsize = RL_BUFSIZE;
     int position = 0;
     int len = 0;
-    char* buffer = malloc(sizeof(char) * bufsize);
     int c;
     struct termios orig_termios;
+    
+    char* buffer = malloc(sizeof(char) * bufsize);
     check_malloc(buffer);
 
     enable_raw_mode(&orig_termios);
@@ -243,113 +251,28 @@ char* read_line() {
 
         if (len >= bufsize) {
             bufsize += RL_BUFSIZE;
-            buffer = realloc(buffer, bufsize * sizeof(char));
-            check_malloc(buffer);
+            void* res = realloc(buffer, bufsize * sizeof(char));
+            check_realloc(res, buffer);
+            buffer = res;
         }
 
     }
     disable_raw_mode(&orig_termios);
 }
 
-/*char** split_line(char* line) {*/
-/*    if (line == NULL) {*/
-/*        return NULL;*/
-/*    }*/
-/**/
-/**/
-/*    int bufsize = TOK_BUFSIZE;*/
-/*    int position = 0;*/
-/*    char** tokens = malloc(bufsize * sizeof(char*));*/
-/*    char* token;*/
-/**/
-/*    check_malloc(tokens);*/
-/**/
-/*    //TODO use reentrant version strtok_r instead.*/
-/*    token = strtok(line, TOK_DELIM);*/
-/*    while (token != NULL) {*/
-/*        tokens[position] = token;*/
-/*        position += 1;*/
-/**/
-/*        if (position >= bufsize) {*/
-/*            bufsize += TOK_BUFSIZE;*/
-/*            tokens = realloc(tokens, bufsize * sizeof(char*));*/
-/*            check_malloc(tokens);*/
-/*        }*/
-/**/
-/*        token = strtok(NULL, TOK_DELIM);*/
-/*    }*/
-/*    tokens[position] = NULL;*/
-/*    return tokens;*/
-/*}*/
-
-int launch(char** args) {
-    pid_t pid, wpid;
-    int status;
-
-    pid = fork();
-    if (pid == 0) {
-        // Child process
-        if (execvp(args[0], args) == -1) {
-            perror("jsh");
-        }
-        exit(EXIT_FAILURE);
-    } else if (pid < 0) {
-        // Error forking
-        perror("jsh");
-    } else {
-        // Parent
-        do {
-            wpid = waitpid(pid, &status, WUNTRACED);
-        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
-    }
-    return 1;
-}
-
-int execute(char** args) {
-    if (args == NULL || args[0] == NULL) {
-        return 1;
-    }
-
-    for (int i = 0; i < num_bi(); i++) {
-        if (strcmp(args[0], bi_list[i]) == 0) {
-            return (*bi_func[i])(args);
-        }
-    }
-    return launch(args);
-}
-
-
-/*void main_loop_original() {*/
-/*    char* line;*/
-/*    char** args;*/
-/*    int status;*/
-/**/
-/*    do {*/
-/*        print_prompt();*/
-/*        line = read_line();*/
-/*        //printf("\nInput: %s\n", line);*/
-/*        args = split_line(line);*/
-/*        status = execute(args);*/
-/**/
-/*        free(line);*/
-/*        free(args);*/
-/*    } while (status);*/
-/*}*/
-
 void main_loop_new() {
     char* line;
-    job* job;
-    int status;
+    job* jobs;
 
     do {
         print_prompt();
         line = read_line();
-        job = parse_line(line);
-        launch_job(job, IN_FOREGROUND);
+        jobs = parse_line(line);
+        launch_job(jobs, IN_FOREGROUND);
 
         free(line);
-        free_job(job);
-    } while (status);
+        free_job_list(jobs);
+    } while (1);
 }
 
 

@@ -57,6 +57,10 @@ job* parse_line(char* line) {
     j->stdout = STDOUT_FILENO;
     j->stderr = STDERR_FILENO;
     j->next = NULL;
+    j->command = argv[0];
+    j->pgid = 0;
+
+
     
     return j;
 }

@@ -5,14 +5,17 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <errno.h>
+#include <string.h>
 
 #include "../include/jsh.h"
 
 
 void launch_process(process* p, pid_t pgid, int infile, int outfile, int errfile, int foreground) {
-    printf("\nLaunching: %s \n", p->argv[0]);
-
     pid_t pid;
+
+    
+
+
 
     if (shell_is_interactive) {
         // Put the process into the process group and give the process
@@ -154,7 +157,6 @@ void do_job_notification() {
             } else {
                 first_job = jnext;
             }
-            free_job(j);
         } else if (job_is_stopped(j) && !j->notified) {
             format_job_info(j, "stopped");
             j->notified = 1;
@@ -236,6 +238,10 @@ void launch_job(job* j, int foreground) {
     pid_t pid;
     int mypipe[2], infile, outfile;
 
+
+
+
+
     infile = j->stdin;
     for (p = j->first_process; p; p = p->next) {
         // Set up pipes if necessary
@@ -247,6 +253,14 @@ void launch_job(job* j, int foreground) {
             outfile = mypipe[1];
         } else {
             outfile = j->stdout;
+        }
+        
+        // Check for built-in command
+        for (int i = 0; i < num_bi(); i++) {
+            if (strcmp(p->argv[0], bi_list[i]) == 0) {
+                (*bi_func[i])(p->argv);
+                return;
+            }
         }
 
         // Fork the child process 
@@ -295,27 +309,33 @@ void launch_job(job* j, int foreground) {
  * Free all memory assicated with a process
  */
 void free_process(process* p) {
-    //printf("Freeing process %s\n", p->argv[0]);
-    //free(p->argv);
+    free(p->argv);
     free(p);
 }
 
-
 /*
- * Free all memory associated with a job 
+ * Free all memory associated with a list of jobs
  */
-void free_job(job* j) {
-    process* p;
-    process* next;
+void free_job_list(job* j) {
+    job* tmp;
+    job* current_job;
 
-    free_process(p);
+    current_job = j;
+    while (current_job) {
+        process* p;
+        process* current_proc;
+        
+        current_proc = current_job->first_process;
+        while (current_proc) {
+            p = current_proc;
+            current_proc = current_proc->next;
+            free_process(p);
+        }
 
-
-    // for (p = j->first_process; p; p = p->next) {
-    //     free_process(p);
-    // }
-
-    free(j);
+        tmp = current_job;
+        current_job = current_job->next;
+        free(tmp);
+    }
 }
 
 

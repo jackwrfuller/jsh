@@ -42,14 +42,15 @@ extern int shell_terminal;
 extern int shell_is_interactive;
 
 
-
+extern char* bi_list[];
+extern int (*bi_func[]) (char **);
+int num_bi();
 
 void init();
 void launch_job(job* j, int foreground);
 job* parse_line(char* line);
 
-
-void free_job(job* j);
+void free_job_list(job* j);
 
 int job_is_stopped(job* j);
 int job_is_completed(job* j);
