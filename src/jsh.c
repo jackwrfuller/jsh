@@ -16,6 +16,8 @@ int bi_help(char** args);
 int bi_exit(char** args);
 int bi_clear(char** args);
 
+static char* prev_line;
+
 job* first_job = NULL;
 
 char* bi_list[] = {
@@ -77,7 +79,6 @@ int bi_help(char** args) {
 
 int bi_exit(char** args) {
     exit(0);
-    //return 0;
 }
 
 int bi_clear(char** args) {
@@ -143,8 +144,7 @@ char* read_line() {
     enable_raw_mode(&orig_termios);
     
     while (1) {
-        c = getchar();
-        //printf("%i\n", c);    
+        c = getchar();   
         // CTRL-D, which is sent as 0x04 in raw mode.
         if (c == '\x04') {
             if (len == 0) {
@@ -179,6 +179,19 @@ char* read_line() {
                         printf("%c", buffer[position]);
                         position += 1;
                     }
+                } else if (seq[1] == 'A') {
+                    // Up arrow, print last command
+                    for (int i = 0; i < len; i++) {
+                        printf("\b \b");
+                    }
+
+                    memset(buffer, 0, bufsize);
+                    memcpy(buffer, prev_line, strlen(prev_line));
+                    
+                    printf("%s", buffer);
+                    len = strlen(prev_line);
+                    position = strlen(prev_line);
+
                 } else if (seq[1] == '3') {
                     seq[2] = getchar();
                     // DEL key was pressed
@@ -260,19 +273,28 @@ char* read_line() {
     disable_raw_mode(&orig_termios);
 }
 
+
+
 void main_loop_new() {
     char* line;
     job* jobs;
 
-    do {
+    while (1) {
         print_prompt();
         line = read_line();
+        
+        // Clear the previous last command and save the new one.
+        if (prev_line) {
+            free(prev_line);
+        }
+        prev_line = strdup(line);
+
         jobs = parse_line(line);
         launch_job(jobs, IN_FOREGROUND);
-
-        free(line);
+        
+        // Clean up memory
         free_job_list(jobs);
-    } while (1);
+    }
 }
 
 

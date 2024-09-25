@@ -292,7 +292,7 @@ void launch_job(job* j, int foreground) {
             infile = mypipe[0];
         }
         
-        format_job_info(j, "launched");
+        //format_job_info(j, "launched");
 
         if (!shell_is_interactive) {
             wait_for_job(j);
