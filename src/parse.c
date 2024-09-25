@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "../include/jsh.h"
 
@@ -32,4 +33,30 @@ char** split_line(char* line) {
     }
     tokens[position] = NULL;
     return tokens;
+}
+
+job* parse_line(char* line) {
+    job* j;
+    process* p;
+    char** argv;
+    
+
+    p = (process*) malloc(sizeof(process));
+    check_malloc(p);
+    
+    argv = split_line(line);
+    p->argv = argv;
+
+    p->next = NULL;
+
+    j = (job*) malloc(sizeof(job));
+    check_malloc(j);
+    
+    j->first_process = p;
+    j->stdin = STDIN_FILENO;
+    j->stdout = STDOUT_FILENO;
+    j->stderr = STDERR_FILENO;
+    j->next = NULL;
+    
+    return j;
 }

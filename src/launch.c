@@ -10,6 +10,8 @@
 
 
 void launch_process(process* p, pid_t pgid, int infile, int outfile, int errfile, int foreground) {
+    printf("\nLaunching: %s \n", p->argv[0]);
+
     pid_t pid;
 
     if (shell_is_interactive) {
@@ -293,6 +295,8 @@ void launch_job(job* j, int foreground) {
  * Free all memory assicated with a process
  */
 void free_process(process* p) {
+    //printf("Freeing process %s\n", p->argv[0]);
+    //free(p->argv);
     free(p);
 }
 
@@ -302,10 +306,14 @@ void free_process(process* p) {
  */
 void free_job(job* j) {
     process* p;
+    process* next;
 
-    for (p = j->first_process; p; p = p->next) {
-        free_process(p);
-    }
+    free_process(p);
+
+
+    // for (p = j->first_process; p; p = p->next) {
+    //     free_process(p);
+    // }
 
     free(j);
 }
