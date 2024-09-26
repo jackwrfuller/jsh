@@ -148,9 +148,8 @@ int input_redirection_used = 0;  // Flag for '<' redirection
 int output_redirection_used = 0; // Flag for '>', '>>', etc.
 
 static job_table* jt = NULL;
-
-cmd_table* cur_cmd_table;
-simple_cmd* cur_cmd;
+static cmd_table* cur_cmd_table = NULL;
+static simple_cmd* cur_cmd = NULL;
 
 
 
@@ -158,7 +157,7 @@ simple_cmd* cur_cmd;
 
 
 /* Line 216 of yacc.c.  */
-#line 162 "jsh.tab.c"
+#line 161 "jsh.tab.c"
 
 #ifdef short
 # undef short
@@ -450,10 +449,10 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    35,    35,    40,    44,    45,    49,    55,    63,    67,
-      73,    80,    80,    81,    85,    85,    89,    89,    90,    95,
-      96,   101,   101,   110,   110,   119,   119,   128,   128,   137,
-     137,   149,   150
+       0,    34,    34,    39,    43,    44,    48,    58,    66,    70,
+      76,    83,    83,    84,    88,    88,    92,    92,    93,    98,
+      99,   104,   104,   113,   113,   122,   122,   131,   131,   140,
+     140,   152,   153
 };
 #endif
 
@@ -1381,7 +1380,7 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 35 "jsh.y"
+#line 34 "jsh.y"
     { 
         if (jt == NULL) {
             jt = create_job_table();
@@ -1390,36 +1389,40 @@ yyreduce:
     break;
 
   case 6:
-#line 49 "jsh.y"
+#line 48 "jsh.y"
     {
-        printf("JOB %d\n", jt->jobc);
+        printf("START JOB %d\n", jt->jobc);
+
+        cur_cmd_table = &jt->jobs[jt->jobc];
+
+        jt->jobc += 1;
     ;}
     break;
 
   case 7:
-#line 55 "jsh.y"
+#line 58 "jsh.y"
     {
-        jt->jobc += 1;
+        
         printf("END JOB\n");
     ;}
     break;
 
   case 8:
-#line 64 "jsh.y"
+#line 67 "jsh.y"
     {  
         printf("\nSEMICOLON\n");
     ;}
     break;
 
   case 9:
-#line 67 "jsh.y"
+#line 70 "jsh.y"
     {  
         printf("\nNEWLINE\n");
     ;}
     break;
 
   case 10:
-#line 73 "jsh.y"
+#line 76 "jsh.y"
     {
         input_redirection_used = 0;   // Reset flags after each job
         output_redirection_used = 0;
@@ -1427,22 +1430,22 @@ yyreduce:
     break;
 
   case 11:
-#line 80 "jsh.y"
+#line 83 "jsh.y"
     { printf("PIPE "); ;}
     break;
 
   case 14:
-#line 85 "jsh.y"
+#line 88 "jsh.y"
     { printf("WORD=%s ", (yyvsp[(1) - (1)].string_value)); ;}
     break;
 
   case 16:
-#line 89 "jsh.y"
+#line 92 "jsh.y"
     { printf("WORD=%s ", (yyvsp[(1) - (1)].string_value)); ;}
     break;
 
   case 21:
-#line 101 "jsh.y"
+#line 104 "jsh.y"
     { 
         if (output_redirection_used) {
             yyerror("Multiple output redirections not allowed");
@@ -1455,12 +1458,12 @@ yyreduce:
     break;
 
   case 22:
-#line 109 "jsh.y"
+#line 112 "jsh.y"
     { printf("WORD=%s ", (yyvsp[(3) - (3)].string_value)); ;}
     break;
 
   case 23:
-#line 110 "jsh.y"
+#line 113 "jsh.y"
     { 
         if (output_redirection_used) {
             yyerror("Multiple output redirections not allowed");
@@ -1473,12 +1476,12 @@ yyreduce:
     break;
 
   case 24:
-#line 118 "jsh.y"
+#line 121 "jsh.y"
     { printf("WORD=%s ", (yyvsp[(3) - (3)].string_value)); ;}
     break;
 
   case 25:
-#line 119 "jsh.y"
+#line 122 "jsh.y"
     { 
         if (output_redirection_used) {
             yyerror("Multiple output redirections not allowed");
@@ -1491,12 +1494,12 @@ yyreduce:
     break;
 
   case 26:
-#line 127 "jsh.y"
+#line 130 "jsh.y"
     { printf("WORD=%s ", (yyvsp[(3) - (3)].string_value)); ;}
     break;
 
   case 27:
-#line 128 "jsh.y"
+#line 131 "jsh.y"
     { 
         if (output_redirection_used) {
             yyerror("Multiple output redirections not allowed");
@@ -1509,12 +1512,12 @@ yyreduce:
     break;
 
   case 28:
-#line 136 "jsh.y"
+#line 139 "jsh.y"
     { printf("WORD=%s ", (yyvsp[(3) - (3)].string_value)); ;}
     break;
 
   case 29:
-#line 137 "jsh.y"
+#line 140 "jsh.y"
     { 
         if (input_redirection_used) {
             yyerror("Multiple input redirections not allowed");
@@ -1527,18 +1530,18 @@ yyreduce:
     break;
 
   case 30:
-#line 145 "jsh.y"
+#line 148 "jsh.y"
     { printf("WORD=%s ", (yyvsp[(3) - (3)].string_value)); ;}
     break;
 
   case 31:
-#line 149 "jsh.y"
+#line 152 "jsh.y"
     { printf("AMP "); ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1542 "jsh.tab.c"
+#line 1545 "jsh.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1752,7 +1755,7 @@ yyreturn:
 }
 
 
-#line 152 "jsh.y"
+#line 155 "jsh.y"
 
 
 int main() {

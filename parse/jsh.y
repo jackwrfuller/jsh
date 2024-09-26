@@ -21,9 +21,8 @@ int input_redirection_used = 0;  // Flag for '<' redirection
 int output_redirection_used = 0; // Flag for '>', '>>', etc.
 
 static job_table* jt = NULL;
-
-cmd_table* cur_cmd_table;
-simple_cmd* cur_cmd;
+static cmd_table* cur_cmd_table = NULL;
+static simple_cmd* cur_cmd = NULL;
 
 
 
@@ -47,13 +46,15 @@ job_list:
 
 before_job_action:
     {
-        printf("JOB %d\n", jt->jobc);
+        printf("START JOB %d\n", jt->jobc);
+        cur_cmd_table = &jt->jobs[jt->jobc];
+        jt->jobc += 1;
     }
     ;
 
 end_job_action:
     {
-        jt->jobc += 1;
+        
         printf("END JOB\n");
     }
     ;
@@ -73,6 +74,18 @@ job:
     pipe_list io_modifier_list background_optional {
         input_redirection_used = 0;   // Reset flags after each job
         output_redirection_used = 0;
+    }
+    ;
+
+before_cmd_action:
+    {
+
+    }
+    ;
+
+after_cmd_action:
+    {
+
     }
     ;
 
