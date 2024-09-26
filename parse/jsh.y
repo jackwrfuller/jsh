@@ -20,7 +20,7 @@ void yyerror(char* string) {
 int input_redirection_used = 0;  // Flag for '<' redirection
 int output_redirection_used = 0; // Flag for '>', '>>', etc.
 
-job_table* jt;
+static job_table* jt = NULL;
 
 cmd_table* cur_cmd_table;
 simple_cmd* cur_cmd;
@@ -32,14 +32,41 @@ simple_cmd* cur_cmd;
 
 %%
 input: 
-   job_list
-   | // Empty
-   ;
+    job_list { 
+        if (jt == NULL) {
+            jt = create_job_table();
+        }
+    }
+    | // Empty
+    ;
 
 job_list:
-    job SEMICOLON { printf("\nSEMICOLON\n"); } job_list 
-    | job NEWLINE { printf("\nNEWLINE\n"); } job_list
-    | job NEWLINE
+    before_job_action job_list_item end_job_action job_list
+    | before_job_action job_list_item end_job_action
+    ;
+
+before_job_action:
+    {
+        printf("JOB %d\n", jt->jobc);
+    }
+    ;
+
+end_job_action:
+    {
+        jt->jobc += 1;
+        printf("END JOB\n");
+    }
+    ;
+
+job_list_item:
+
+    job SEMICOLON 
+    {  
+        printf("\nSEMICOLON\n");
+    }
+    | job NEWLINE {  
+        printf("\nNEWLINE\n");
+    }
     ;
 
 job:
@@ -126,7 +153,6 @@ background_optional:
 
 int main() {
     jt = create_job_table();
-
     yyparse();
     return 0;
 }

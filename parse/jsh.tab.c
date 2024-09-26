@@ -147,12 +147,18 @@ void yyerror(char* string) {
 int input_redirection_used = 0;  // Flag for '<' redirection
 int output_redirection_used = 0; // Flag for '>', '>>', etc.
 
-job_table* jt;
+static job_table* jt = NULL;
+
+cmd_table* cur_cmd_table;
+simple_cmd* cur_cmd;
+
+
+
 
 
 
 /* Line 216 of yacc.c.  */
-#line 156 "jsh.tab.c"
+#line 162 "jsh.tab.c"
 
 #ifdef short
 # undef short
@@ -365,16 +371,16 @@ union yyalloc
 #endif
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  8
+#define YYFINAL  4
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   22
+#define YYLAST   21
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  13
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  20
+#define YYNNTS  21
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  31
+#define YYNRULES  32
 /* YYNRULES -- Number of states.  */
 #define YYNSTATES  41
 
@@ -422,32 +428,32 @@ static const yytype_uint8 yytranslate[] =
    YYRHS.  */
 static const yytype_uint8 yyprhs[] =
 {
-       0,     0,     3,     5,     6,     7,    12,    13,    18,    21,
-      25,    26,    31,    33,    34,    38,    39,    43,    44,    47,
-      48,    49,    53,    54,    58,    59,    63,    64,    68,    69,
-      73,    75
+       0,     0,     3,     5,     6,    11,    15,    16,    17,    20,
+      23,    27,    28,    33,    35,    36,    40,    41,    45,    46,
+      49,    50,    51,    55,    56,    60,    61,    65,    66,    70,
+      71,    75,    77
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      14,     0,    -1,    15,    -1,    -1,    -1,    18,     4,    16,
-      15,    -1,    -1,    18,     5,    17,    15,    -1,    18,     5,
-      -1,    19,    25,    32,    -1,    -1,    21,     9,    20,    19,
-      -1,    21,    -1,    -1,     3,    22,    23,    -1,    -1,     3,
-      24,    23,    -1,    -1,    25,    26,    -1,    -1,    -1,     6,
-      27,     3,    -1,    -1,    10,    28,     3,    -1,    -1,    11,
-      29,     3,    -1,    -1,    12,    30,     3,    -1,    -1,     7,
-      31,     3,    -1,     8,    -1,    -1
+      14,     0,    -1,    15,    -1,    -1,    16,    18,    17,    15,
+      -1,    16,    18,    17,    -1,    -1,    -1,    19,     4,    -1,
+      19,     5,    -1,    20,    26,    33,    -1,    -1,    22,     9,
+      21,    20,    -1,    22,    -1,    -1,     3,    23,    24,    -1,
+      -1,     3,    25,    24,    -1,    -1,    26,    27,    -1,    -1,
+      -1,     6,    28,     3,    -1,    -1,    10,    29,     3,    -1,
+      -1,    11,    30,     3,    -1,    -1,    12,    31,     3,    -1,
+      -1,     7,    32,     3,    -1,     8,    -1,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    29,    29,    30,    34,    34,    35,    35,    36,    40,
-      47,    47,    48,    52,    52,    56,    56,    57,    62,    63,
-      68,    68,    77,    77,    86,    86,    95,    95,   104,   104,
-     116,   117
+       0,    35,    35,    40,    44,    45,    49,    55,    63,    67,
+      73,    80,    80,    81,    85,    85,    89,    89,    90,    95,
+      96,   101,   101,   110,   110,   119,   119,   128,   128,   137,
+     137,   149,   150
 };
 #endif
 
@@ -458,9 +464,10 @@ static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "WORD", "SEMICOLON", "NEWLINE", "GREAT",
   "LESS", "AMP", "PIPE", "GREAT_AMP", "GREAT_GREAT", "GREAT_GREAT_AMP",
-  "$accept", "input", "job_list", "@1", "@2", "job", "pipe_list", "@3",
-  "cmd_and_args", "@4", "arg_list", "@5", "io_modifier_list",
-  "io_modifier", "@6", "@7", "@8", "@9", "@10", "background_optional", 0
+  "$accept", "input", "job_list", "before_job_action", "end_job_action",
+  "job_list_item", "job", "pipe_list", "@1", "cmd_and_args", "@2",
+  "arg_list", "@3", "io_modifier_list", "io_modifier", "@4", "@5", "@6",
+  "@7", "@8", "background_optional", 0
 };
 #endif
 
@@ -477,19 +484,19 @@ static const yytype_uint16 yytoknum[] =
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    13,    14,    14,    16,    15,    17,    15,    15,    18,
-      20,    19,    19,    22,    21,    24,    23,    23,    25,    25,
-      27,    26,    28,    26,    29,    26,    30,    26,    31,    26,
-      32,    32
+       0,    13,    14,    14,    15,    15,    16,    17,    18,    18,
+      19,    21,    20,    20,    23,    22,    25,    24,    24,    26,
+      26,    28,    27,    29,    27,    30,    27,    31,    27,    32,
+      27,    33,    33
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     1,     0,     0,     4,     0,     4,     2,     3,
-       0,     4,     1,     0,     3,     0,     3,     0,     2,     0,
-       0,     3,     0,     3,     0,     3,     0,     3,     0,     3,
-       1,     0
+       0,     2,     1,     0,     4,     3,     0,     0,     2,     2,
+       3,     0,     4,     1,     0,     3,     0,     3,     0,     2,
+       0,     0,     3,     0,     3,     0,     3,     0,     3,     0,
+       3,     1,     0
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -497,66 +504,68 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       3,    13,     0,     2,     0,    19,    12,    17,     1,     4,
-       6,    31,    10,    15,    14,     0,     0,    20,    28,    30,
-      22,    24,    26,    18,     9,     0,    17,     5,     7,     0,
-       0,     0,     0,     0,    11,    16,    21,    29,    23,    25,
-      27
+       3,     0,     2,     0,     1,    14,     7,     0,    20,    13,
+      18,     5,     8,     9,    32,    11,    16,    15,     4,    21,
+      29,    31,    23,    25,    27,    19,    10,     0,    18,     0,
+       0,     0,     0,     0,    12,    17,    22,    30,    24,    26,
+      28
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     2,     3,    15,    16,     4,     5,    25,     6,     7,
-      14,    26,    11,    23,    29,    31,    32,    33,    30,    24
+      -1,     1,     2,     3,    11,     6,     7,     8,    27,     9,
+      10,    17,    28,    14,    25,    29,    31,    32,    33,    30,
+      26
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -11
+#define YYPACT_NINF -9
 static const yytype_int8 yypact[] =
 {
-       0,   -11,     9,   -11,     3,   -11,     4,    11,   -11,   -11,
-      12,    -6,   -11,   -11,   -11,     0,     0,   -11,   -11,   -11,
-     -11,   -11,   -11,   -11,   -11,     0,    11,   -11,   -11,    13,
-      14,    15,    16,    17,   -11,   -11,   -11,   -11,   -11,   -11,
-     -11
+       0,     9,    -9,     7,    -9,    -9,    -9,     3,    -9,     2,
+      10,     0,    -9,    -9,    -6,    -9,    -9,    -9,    -9,    -9,
+      -9,    -9,    -9,    -9,    -9,    -9,    -9,     7,    10,    11,
+      12,    13,    14,    15,    -9,    -9,    -9,    -9,    -9,    -9,
+      -9
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -11,   -11,    -5,   -11,   -11,   -11,   -10,   -11,   -11,   -11,
-      -4,   -11,   -11,   -11,   -11,   -11,   -11,   -11,   -11,   -11
+      -9,    -9,     1,    -9,    -9,    -9,    -9,    -8,    -9,    -9,
+      -9,    -7,    -9,    -9,    -9,    -9,    -9,    -9,    -9,    -9,
+      -9
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
    positive, shift that token.  If negative, reduce the rule which
    number is the opposite.  If zero, do what YYDEFACT says.
    If YYTABLE_NINF, syntax error.  */
-#define YYTABLE_NINF -9
+#define YYTABLE_NINF -7
 static const yytype_int8 yytable[] =
 {
-      17,    18,    19,     1,    20,    21,    22,     9,    10,     8,
-      27,    28,    -8,    12,    13,    34,    36,    37,    38,    39,
-      40,     0,    35
+      19,    20,    21,    -6,    22,    23,    24,    12,    13,     4,
+       5,    15,    18,    16,    36,    37,    38,    39,    40,    34,
+       0,    35
 };
 
 static const yytype_int8 yycheck[] =
 {
        6,     7,     8,     3,    10,    11,    12,     4,     5,     0,
-      15,    16,     0,     9,     3,    25,     3,     3,     3,     3,
-       3,    -1,    26
+       3,     9,    11,     3,     3,     3,     3,     3,     3,    27,
+      -1,    28
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,    14,    15,    18,    19,    21,    22,     0,     4,
-       5,    25,     9,     3,    23,    16,    17,     6,     7,     8,
-      10,    11,    12,    26,    32,    20,    24,    15,    15,    27,
-      31,    28,    29,    30,    19,    23,     3,     3,     3,     3,
+       0,    14,    15,    16,     0,     3,    18,    19,    20,    22,
+      23,    17,     4,     5,    26,     9,     3,    24,    15,     6,
+       7,     8,    10,    11,    12,    27,    33,    21,    25,    28,
+      32,    29,    30,    31,    20,    24,     3,     3,     3,     3,
        3
 };
 
@@ -1371,41 +1380,69 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-        case 4:
-#line 34 "jsh.y"
-    { printf("\nSEMICOLON\n"); ;}
+        case 2:
+#line 35 "jsh.y"
+    { 
+        if (jt == NULL) {
+            jt = create_job_table();
+        }
+    ;}
     break;
 
   case 6:
-#line 35 "jsh.y"
-    { printf("\nNEWLINE\n"); ;}
+#line 49 "jsh.y"
+    {
+        printf("JOB %d\n", jt->jobc);
+    ;}
+    break;
+
+  case 7:
+#line 55 "jsh.y"
+    {
+        jt->jobc += 1;
+        printf("END JOB\n");
+    ;}
+    break;
+
+  case 8:
+#line 64 "jsh.y"
+    {  
+        printf("\nSEMICOLON\n");
+    ;}
     break;
 
   case 9:
-#line 40 "jsh.y"
+#line 67 "jsh.y"
+    {  
+        printf("\nNEWLINE\n");
+    ;}
+    break;
+
+  case 10:
+#line 73 "jsh.y"
     {
         input_redirection_used = 0;   // Reset flags after each job
         output_redirection_used = 0;
     ;}
     break;
 
-  case 10:
-#line 47 "jsh.y"
+  case 11:
+#line 80 "jsh.y"
     { printf("PIPE "); ;}
     break;
 
-  case 13:
-#line 52 "jsh.y"
+  case 14:
+#line 85 "jsh.y"
     { printf("WORD=%s ", (yyvsp[(1) - (1)].string_value)); ;}
     break;
 
-  case 15:
-#line 56 "jsh.y"
+  case 16:
+#line 89 "jsh.y"
     { printf("WORD=%s ", (yyvsp[(1) - (1)].string_value)); ;}
     break;
 
-  case 20:
-#line 68 "jsh.y"
+  case 21:
+#line 101 "jsh.y"
     { 
         if (output_redirection_used) {
             yyerror("Multiple output redirections not allowed");
@@ -1417,13 +1454,13 @@ yyreduce:
     ;}
     break;
 
-  case 21:
-#line 76 "jsh.y"
+  case 22:
+#line 109 "jsh.y"
     { printf("WORD=%s ", (yyvsp[(3) - (3)].string_value)); ;}
     break;
 
-  case 22:
-#line 77 "jsh.y"
+  case 23:
+#line 110 "jsh.y"
     { 
         if (output_redirection_used) {
             yyerror("Multiple output redirections not allowed");
@@ -1435,13 +1472,13 @@ yyreduce:
     ;}
     break;
 
-  case 23:
-#line 85 "jsh.y"
+  case 24:
+#line 118 "jsh.y"
     { printf("WORD=%s ", (yyvsp[(3) - (3)].string_value)); ;}
     break;
 
-  case 24:
-#line 86 "jsh.y"
+  case 25:
+#line 119 "jsh.y"
     { 
         if (output_redirection_used) {
             yyerror("Multiple output redirections not allowed");
@@ -1453,13 +1490,13 @@ yyreduce:
     ;}
     break;
 
-  case 25:
-#line 94 "jsh.y"
+  case 26:
+#line 127 "jsh.y"
     { printf("WORD=%s ", (yyvsp[(3) - (3)].string_value)); ;}
     break;
 
-  case 26:
-#line 95 "jsh.y"
+  case 27:
+#line 128 "jsh.y"
     { 
         if (output_redirection_used) {
             yyerror("Multiple output redirections not allowed");
@@ -1471,13 +1508,13 @@ yyreduce:
     ;}
     break;
 
-  case 27:
-#line 103 "jsh.y"
+  case 28:
+#line 136 "jsh.y"
     { printf("WORD=%s ", (yyvsp[(3) - (3)].string_value)); ;}
     break;
 
-  case 28:
-#line 104 "jsh.y"
+  case 29:
+#line 137 "jsh.y"
     { 
         if (input_redirection_used) {
             yyerror("Multiple input redirections not allowed");
@@ -1489,19 +1526,19 @@ yyreduce:
     ;}
     break;
 
-  case 29:
-#line 112 "jsh.y"
+  case 30:
+#line 145 "jsh.y"
     { printf("WORD=%s ", (yyvsp[(3) - (3)].string_value)); ;}
     break;
 
-  case 30:
-#line 116 "jsh.y"
+  case 31:
+#line 149 "jsh.y"
     { printf("AMP "); ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1505 "jsh.tab.c"
+#line 1542 "jsh.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1715,12 +1752,11 @@ yyreturn:
 }
 
 
-#line 119 "jsh.y"
+#line 152 "jsh.y"
 
 
 int main() {
     jt = create_job_table();
-
     yyparse();
     return 0;
 }

@@ -72,3 +72,5 @@ void insert_arg(simple_cmd* simple_cmd, char* arg) {
     simple_cmd->argc += 1;
     simple_cmd->argv[simple_cmd->argc] = strdup(arg); 
 }
+
+
