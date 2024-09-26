@@ -1,25 +1,36 @@
+#ifndef COMMANDS_H
+#define COMMANDS_H 
 
-typedef struct __simple_command {
-    int MAX;
+
+#define MAX_JOBS 64
+#define MAX_ARGS 64
+#define MAX_CMDS 64
+
+
+typedef struct __simple_cmd {
     int argc;
     char** argv;
-} simple_command;
+} simple_cmd;
 
-void insert_arg(simple_command* cmd, char* arg);
-
-typedef struct __command {
-    int max_simple_cmd;
-    int commmandc;
-    simple_command** simple_cmds;
-    char* outfile;
+typedef struct __cmd_table {
+    int cmdc;                   // The number of commands stored currently.
+    simple_cmd* simple_cmds;
     char* infile;
+    char* outfile;
     char* errfile;
     int foreground;
-} command;
+} cmd_table;
 
-void insert_simple_cmd(command* cmd, simple_command* simple_cmd);
+typedef struct __job_table {
+    int jobc;
+    cmd_table* jobs;
+} job_table;
 
-static command* current_cmd;
-static simple_command* current_simple_cmd;
+job_table* create_job_table();
 
 
+void insert_arg(simple_cmd* simple_cmd, char* arg);
+void insert_cmd(cmd_table* cmd_table, simple_cmd* simple_cmd);
+void insert_job(job_table* job_table, cmd_table* cmd_table);
+
+#endif

@@ -20,6 +20,14 @@ void yyerror(char* string) {
 int input_redirection_used = 0;  // Flag for '<' redirection
 int output_redirection_used = 0; // Flag for '>', '>>', etc.
 
+job_table* jt;
+
+cmd_table* cur_cmd_table;
+simple_cmd* cur_cmd;
+
+
+
+
 %}
 
 %%
@@ -117,6 +125,8 @@ background_optional:
 %%
 
 int main() {
+    jt = create_job_table();
+
     yyparse();
     return 0;
 }
