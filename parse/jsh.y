@@ -8,6 +8,7 @@
 %{
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "commands.h" 
 
 extern int yylex(void);
@@ -21,9 +22,9 @@ int input_redirection_used = 0;  // Flag for '<' redirection
 int output_redirection_used = 0; // Flag for '>', '>>', etc.
 
 static job_table* jt = NULL;
-static cmd_table* cur_cmd_table = NULL;
-static simple_cmd* cur_cmd = NULL;
-
+static proc_table* cur_proc_table = NULL;
+static proc* cur_proc = NULL;
+static char* cur_arg = NULL;
 
 
 
@@ -40,19 +41,19 @@ input:
     ;
 
 job_list:
-    before_job_action job_list_item end_job_action job_list
-    | before_job_action job_list_item end_job_action
+    bja job_list_item afa job_list
+    | bja job_list_item afa
     ;
 
-before_job_action:
+bja:
     {
-        printf("START JOB %d\n", jt->jobc);
-        cur_cmd_table = &jt->jobs[jt->jobc];
+        printf("\nSTART JOB %d\n", jt->jobc);
+        cur_proc_table = &jt->jobs[jt->jobc];
         jt->jobc += 1;
     }
     ;
 
-end_job_action:
+afa:
     {
         
         printf("END JOB\n");
@@ -77,32 +78,46 @@ job:
     }
     ;
 
-before_cmd_action:
+bpa:
     {
-
+        printf("\nSTART PROC %d\n", cur_proc_table->procc);
+        cur_proc = &cur_proc_table->procs[cur_proc_table->procc];
+        cur_proc_table->procc += 1;
     }
     ;
 
-after_cmd_action:
+apa:
     {
-
+        printf("\nEND PROC\n");
     }
     ;
 
 pipe_list:
-    cmd_and_args PIPE { printf("PIPE "); } pipe_list  
-    | cmd_and_args
+    bpa proc apa PIPE { printf("PIPE "); } pipe_list  
+    | bpa proc apa
     ;
 
-cmd_and_args:
-    WORD { printf("WORD=%s ", $1); } arg_list 
+proc:
+    baa WORD { printf("WORD=%s ", $2); } arg_list 
     ;
 
 arg_list:
-    WORD { printf("WORD=%s ", $1); } arg_list 
+    baa WORD { printf("WORD=%s ", $2); } arg_list 
     | // Empty
     ;
 
+baa:
+    {
+        //cur_arg = strdup(&cur_cmd->argv[cur_cmd->argc]);
+        cur_proc->argc += 1;
+    }
+    ;
+
+/* aaa:
+    {
+
+    }
+    ; */
 
 io_modifier_list:
     io_modifier_list io_modifier
@@ -158,9 +173,17 @@ io_modifier:
     } WORD { printf("WORD=%s ", $3); } 
     ;
 
+
 background_optional:
-    AMP { printf("AMP "); }
-    | // Empty 
+    AMP 
+    { 
+        printf("AMP ");
+        cur_proc_table->foreground = 0; 
+    }
+    | // Empty
+    {
+        cur_proc_table->foreground = 1;
+    }
     ;
 %%
 
