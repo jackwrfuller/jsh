@@ -8,7 +8,7 @@
 typedef struct __proc
 {
     int argc;
-    char **argv;
+    char** argv;
 } proc;
 
 typedef struct __proc_table

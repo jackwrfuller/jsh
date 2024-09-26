@@ -4,11 +4,11 @@
 
 #include "commands.h"
 
-void setup_cmd(proc *cmd)
+void setup_proc(proc* proc)
 {
     char **argv;
 
-    cmd->argc = 0;
+    proc->argc = 0;
 
     argv = malloc(MAX_ARGS_PER_PROC * sizeof(char *));
     if (!argv)
@@ -16,7 +16,7 @@ void setup_cmd(proc *cmd)
         fprintf(stderr, "malloc error");
         exit(1);
     }
-    cmd->argv = argv;
+    proc->argv = argv;
 }
 
 void setup_cmd_table(proc_table *ct)
@@ -39,7 +39,7 @@ void setup_cmd_table(proc_table *ct)
 
     for (int i = 0; i < MAX_PROC_PER_JOB; i++)
     {
-        setup_cmd(&ct->procs[i]);
+        setup_proc(&ct->procs[i]);
     }
 }
 

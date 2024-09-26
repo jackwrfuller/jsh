@@ -26,18 +26,43 @@ static proc_table* cur_proc_table = NULL;
 static proc* cur_proc = NULL;
 static char* cur_arg = NULL;
 
+void print_index() {
+    printf("(%i, %i, %i)", jt->jobc, cur_proc_table->procc, cur_proc->argc);
+}
 
+void print_table() {
+    printf("\nPRINTING RESULTING TABLE:\n");
+    proc_table* pt;
+    for (int i = 0; i < jt->jobc; i++) {
+        pt = &jt->jobs[i];
+
+        proc* p;
+        for (int j = 0; j < pt->procc; j++) {
+            p = &pt->procs[j];
+
+            char* arg;
+            for (int k = 0; k < p->argc; k++) {
+                arg = p->argv[k];
+                printf("%s, ", arg);
+            }
+            printf(" | ");
+        }
+        printf("\n");
+    }
+}
 
 %}
 
 %%
 input: 
-    job_list { 
-        if (jt == NULL) {
-            jt = create_job_table();
-        }
-    }
+    before_input job_list { print_table(); }
     | // Empty
+    ;
+
+before_input:
+    {
+        jt = create_job_table();
+    }
     ;
 
 job_list:
@@ -49,26 +74,20 @@ bja:
     {
         printf("\nSTART JOB %d\n", jt->jobc);
         cur_proc_table = &jt->jobs[jt->jobc];
-        jt->jobc += 1;
     }
     ;
 
 afa:
     {
-        
+        jt->jobc += 1;
         printf("END JOB\n");
     }
     ;
 
 job_list_item:
 
-    job SEMICOLON 
-    {  
-        printf("\nSEMICOLON\n");
-    }
-    | job NEWLINE {  
-        printf("\nNEWLINE\n");
-    }
+    job SEMICOLON { printf("\nSEMICOLON\n"); }
+    | job NEWLINE { printf("\nNEWLINE\n");   }
     ;
 
 job:
@@ -78,46 +97,61 @@ job:
     }
     ;
 
-bpa:
-    {
-        printf("\nSTART PROC %d\n", cur_proc_table->procc);
-        cur_proc = &cur_proc_table->procs[cur_proc_table->procc];
-        cur_proc_table->procc += 1;
-    }
-    ;
-
-apa:
-    {
-        printf("\nEND PROC\n");
-    }
-    ;
-
 pipe_list:
     bpa proc apa PIPE { printf("PIPE "); } pipe_list  
     | bpa proc apa
     ;
 
+bpa:
+    {
+        printf("\nSTART PROC %d\n", cur_proc_table->procc);
+        cur_proc = &cur_proc_table->procs[cur_proc_table->procc];
+    }
+    ;
+
+apa:
+    {
+        cur_proc_table->procc += 1;
+        printf("\nEND PROC\n");
+    }
+    ;
+
+
+
 proc:
-    baa WORD { printf("WORD=%s ", $2); } arg_list 
+    baa WORD 
+    { 
+        print_index(); 
+        printf(": \"%s\", ", $2);
+        cur_arg = strdup($2);
+        printf("WORD=%s ", cur_arg); 
+    } 
+    aaa arg_list 
     ;
 
 arg_list:
-    baa WORD { printf("WORD=%s ", $2); } arg_list 
+    baa WORD 
+    { 
+        print_index(); 
+        printf(": \"%s\", ", $2);
+        cur_arg = strdup($2);
+        printf("WORD=%s ", cur_arg);  
+    } 
+    aaa arg_list 
     | // Empty
     ;
 
 baa:
     {
-        //cur_arg = strdup(&cur_cmd->argv[cur_cmd->argc]);
-        cur_proc->argc += 1;
+        cur_arg = cur_proc->argv[cur_proc->argc];
     }
     ;
 
-/* aaa:
+aaa:
     {
-
+        cur_proc->argc += 1;
     }
-    ; */
+    ;
 
 io_modifier_list:
     io_modifier_list io_modifier
@@ -187,8 +221,9 @@ background_optional:
     ;
 %%
 
+
+
 int main() {
-    jt = create_job_table();
     yyparse();
     return 0;
 }
