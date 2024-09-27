@@ -3,7 +3,7 @@
 #include <unistd.h>
 
 #include "../include/jsh.h"
-
+#include "../include/parser.h"
 
 char** split_line(char* line) {
     if (line == NULL) {
@@ -40,7 +40,11 @@ job* parse_line(char* line) {
     process* p;
     char** argv;
     
-
+    job_table* jt;
+    build_table(&jt, line);
+    print_table(jt);
+    free(jt);
+    
     p = (process*) malloc(sizeof(process));
     check_malloc(p);
     

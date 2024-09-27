@@ -6,6 +6,6 @@
 extern job_table* jt;
 
 void print_table();
-int yyparse();
+void build_table(job_table** job_table, char* input);
 
 #endif
