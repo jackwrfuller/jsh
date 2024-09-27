@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../include/commands.h" 
+#include "../include/parser.h" 
 
 extern int yylex(void);
 
@@ -21,7 +21,7 @@ void yyerror(char* string) {
 int input_redirection_used = 0;  // Flag for '<' redirection
 int output_redirection_used = 0; // Flag for '>', '>>', etc.
 
-job_table* jt = NULL;
+//job_table* jt = NULL;
 
 
 static proc_table* cur_proc_table = NULL;
@@ -34,32 +34,6 @@ void print_index() {
 
 void print_word() {
     printf(" %s ", cur_proc->argv[cur_proc->argc]);
-}
-
-void print_table(job_table* jt) {
-    printf("\nPRINTING RESULTING TABLE:\n");
-    proc_table* pt;
-    for (int i = 0; i < jt->jobc; i++) {
-        printf("Job: %i\n", i);
-        pt = &jt->jobs[i];
-
-        proc* p;
-        for (int j = 0; j < pt->procc; j++) {
-            p = &pt->procs[j];
-
-            char* arg;
-            for (int k = 0; k < p->argc; k++) {
-                arg = p->argv[k];
-                printf("%s, ", arg);
-            }
-            printf(" | ");
-        }
-        printf("\n");
-        printf("Infile: %s\n", pt->infile);
-        printf("Outfile: %s\n", pt->outfile);
-        printf("Errfile: %s\n", pt->errfile);
-        printf("Foreground: %i\n", pt->foreground);
-    }
 }
 
 %}

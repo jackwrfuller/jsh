@@ -3,10 +3,10 @@
 %{
 #include <string.h>
 #include <stdio.h>
-#include "jsh.tab.h"
+#include "../include/jsh.tab.h"
 %}
 
-%option header="lexer.h"
+%option header="include/lexer.h"
 
 %%
 ";"                           { return SEMICOLON;         }

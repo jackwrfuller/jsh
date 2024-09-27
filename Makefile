@@ -7,13 +7,13 @@ OBJDIR = build/
 BINDIR = bin/
 TARGET = jsh 
 
-SRC = $(wildcard $(addsuffix *.c, $(SRCDIR)))
+SRC = $(wildcard $(addsuffix *.c, $(SRCDIR))) src/parse/parse.c src/parse/jsh.tab.c src/parse/lex.yy.c
 OBJ = $(addprefix $(OBJDIR), $(patsubst %.c, %.o, $(notdir $(SRC))))
 
 VPATH = $(SRCDIR)
 
 
-$(TARGET) : $(OBJ)
+$(TARGET) :  build_parse $(OBJ) 
 	@echo Linking...
 	@mkdir -p $(BINDIR)
 	@$(CC) $(CFLAGS) -o $(BINDIR)$@ $(OBJ)
@@ -22,6 +22,16 @@ $(OBJDIR)%.o : %.c
 	@echo Compiling $< in $@...
 	@mkdir -p $(OBJDIR)
 	@$(CC) $(CFLAGS) $(addprefix -I,$(INCDIR)) -c -o $@ $< 
+
+build_parse: src/parse/jsh.y src/parse/jsh.l src/parse/parse.c
+	@echo Compiling parse files...
+	@mkdir -p $(OBJDIR)
+	@bison -d src/parse/jsh.y -o $(OBJDIR)jsh.tab.c
+	@flex -o $(OBJDIR)lex.yy.c src/parse/jsh.l
+	@gcc -g -c $(OBJDIR)jsh.tab.c -o $(OBJDIR)jsh.tab.o
+	@gcc -g -c $(OBJDIR)lex.yy.c -o $(OBJDIR)lex.yy.o
+	@gcc -g -c src/parse/parse.c -o $(OBJDIR)parse.o 
+	
 
 clean : 
 	@$(RM) -r $(OBJDIR)

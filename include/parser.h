@@ -35,6 +35,8 @@ extern job_table* jt;
 
 void print_table(job_table* job_table);
 void build_table(job_table** job_table, char* input);
+void insert(job_table* jt, int i, int j, int k, char* arg);
+void set_redirection(job_table* jt, int job_num, char* file, int direction);
 job_table *create_job_table();
 
 #endif
