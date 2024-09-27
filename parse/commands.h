@@ -31,9 +31,7 @@ typedef struct __job_table
 
 job_table *create_job_table();
 
-void insert_arg(proc *proc, char *arg);
-void insert_cmd(proc_table *proc_table, proc *proc);
-void insert_job(job_table *job_table, proc_table *proc_table);
+void print_table(job_table* jt);
 
 void insert(job_table* jt, int i, int j, int k, char* arg);
 void set_redirection(job_table* jt, int job_num, char* file, int direction);

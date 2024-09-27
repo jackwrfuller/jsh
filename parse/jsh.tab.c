@@ -153,7 +153,9 @@ void yyerror(char* string) {
 int input_redirection_used = 0;  // Flag for '<' redirection
 int output_redirection_used = 0; // Flag for '>', '>>', etc.
 
-static job_table* jt = NULL;
+job_table* jt = NULL;
+
+
 static proc_table* cur_proc_table = NULL;
 static proc* cur_proc = NULL;
 static char* cur_arg = NULL;
@@ -166,7 +168,7 @@ void print_word() {
     printf(" %s ", cur_proc->argv[cur_proc->argc]);
 }
 
-void print_table() {
+void print_table(job_table* jt) {
     printf("\nPRINTING RESULTING TABLE:\n");
     proc_table* pt;
     for (int i = 0; i < jt->jobc; i++) {
@@ -193,7 +195,7 @@ void print_table() {
 }
 
 
-#line 197 "jsh.tab.c"
+#line 199 "jsh.tab.c"
 
 
 #ifdef short
@@ -576,10 +578,10 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    67,    67,    68,    69,    73,    79,    80,    84,    91,
-      99,   100,   104,   111,   111,   112,   116,   123,   132,   132,
-     136,   136,   137,   141,   148,   149,   154,   154,   163,   163,
-     172,   172,   181,   181,   190,   190,   203,   209
+       0,    69,    69,    70,    71,    75,    81,    82,    86,    93,
+     101,   102,   106,   113,   113,   114,   118,   125,   134,   134,
+     138,   138,   139,   143,   150,   151,   156,   156,   165,   165,
+     174,   174,   183,   183,   192,   192,   205,   211
 };
 #endif
 
@@ -1166,99 +1168,99 @@ yyreduce:
   switch (yyn)
     {
   case 5: /* before_input: %empty  */
-#line 73 "jsh.y"
+#line 75 "jsh.y"
     {
         jt = create_job_table();
     }
-#line 1174 "jsh.tab.c"
+#line 1176 "jsh.tab.c"
     break;
 
   case 8: /* bja: %empty  */
-#line 84 "jsh.y"
+#line 86 "jsh.y"
     {
         printf("\nSTART JOB %d\n", jt->jobc);
         cur_proc_table = &jt->jobs[jt->jobc];
     }
-#line 1183 "jsh.tab.c"
+#line 1185 "jsh.tab.c"
     break;
 
   case 9: /* afa: %empty  */
-#line 91 "jsh.y"
+#line 93 "jsh.y"
     {
         jt->jobc += 1;
         printf("END JOB\n");
     }
-#line 1192 "jsh.tab.c"
+#line 1194 "jsh.tab.c"
     break;
 
   case 10: /* job_list_item: job SEMICOLON  */
-#line 99 "jsh.y"
+#line 101 "jsh.y"
                   { printf("\nSEMICOLON\n"); }
-#line 1198 "jsh.tab.c"
+#line 1200 "jsh.tab.c"
     break;
 
   case 11: /* job_list_item: job NEWLINE  */
-#line 100 "jsh.y"
+#line 102 "jsh.y"
                   { printf("\nNEWLINE\n");   }
-#line 1204 "jsh.tab.c"
+#line 1206 "jsh.tab.c"
     break;
 
   case 12: /* job: pipe_list io_modifier_list background_optional  */
-#line 104 "jsh.y"
+#line 106 "jsh.y"
                                                    {
         input_redirection_used = 0;   // Reset flags after each job
         output_redirection_used = 0;
     }
-#line 1213 "jsh.tab.c"
+#line 1215 "jsh.tab.c"
     break;
 
   case 13: /* $@1: %empty  */
-#line 111 "jsh.y"
+#line 113 "jsh.y"
                       { printf("PIPE "); }
-#line 1219 "jsh.tab.c"
+#line 1221 "jsh.tab.c"
     break;
 
   case 16: /* bpa: %empty  */
-#line 116 "jsh.y"
+#line 118 "jsh.y"
     {
         printf("\nSTART PROC %d\n", cur_proc_table->procc);
         cur_proc = &cur_proc_table->procs[cur_proc_table->procc];
     }
-#line 1228 "jsh.tab.c"
+#line 1230 "jsh.tab.c"
     break;
 
   case 17: /* apa: %empty  */
-#line 123 "jsh.y"
+#line 125 "jsh.y"
     {
         cur_proc_table->procc += 1;
         printf("\nEND PROC\n");
     }
-#line 1237 "jsh.tab.c"
+#line 1239 "jsh.tab.c"
     break;
 
   case 18: /* $@2: %empty  */
-#line 132 "jsh.y"
+#line 134 "jsh.y"
          { insert(jt, jt->jobc, cur_proc_table->procc, cur_proc->argc, (yyvsp[0].string_value)); }
-#line 1243 "jsh.tab.c"
+#line 1245 "jsh.tab.c"
     break;
 
   case 20: /* $@3: %empty  */
-#line 136 "jsh.y"
+#line 138 "jsh.y"
          { insert(jt, jt->jobc, cur_proc_table->procc, cur_proc->argc, (yyvsp[0].string_value)); }
-#line 1249 "jsh.tab.c"
+#line 1251 "jsh.tab.c"
     break;
 
   case 23: /* aaa: %empty  */
-#line 141 "jsh.y"
+#line 143 "jsh.y"
     {
         print_index();
         print_word();
     }
-#line 1258 "jsh.tab.c"
+#line 1260 "jsh.tab.c"
     break;
 
   case 26: /* $@4: %empty  */
-#line 154 "jsh.y"
+#line 156 "jsh.y"
           { 
         if (output_redirection_used) {
             yyerror("Multiple output redirections not allowed");
@@ -1268,17 +1270,17 @@ yyreduce:
             printf("> ");
         }
     }
-#line 1272 "jsh.tab.c"
+#line 1274 "jsh.tab.c"
     break;
 
   case 27: /* io_modifier: GREAT $@4 WORD  */
-#line 162 "jsh.y"
+#line 164 "jsh.y"
            { printf("WORD=%s ", (yyvsp[0].string_value)); set_redirection(jt, jt->jobc, (yyvsp[0].string_value), 1); }
-#line 1278 "jsh.tab.c"
+#line 1280 "jsh.tab.c"
     break;
 
   case 28: /* $@5: %empty  */
-#line 163 "jsh.y"
+#line 165 "jsh.y"
                 { 
         if (output_redirection_used) {
             yyerror("Multiple output redirections not allowed");
@@ -1288,17 +1290,17 @@ yyreduce:
             printf(">& ");
         }
     }
-#line 1292 "jsh.tab.c"
+#line 1294 "jsh.tab.c"
     break;
 
   case 29: /* io_modifier: GREAT_AMP $@5 WORD  */
-#line 171 "jsh.y"
+#line 173 "jsh.y"
            { printf("WORD=%s ", (yyvsp[0].string_value)); set_redirection(jt, jt->jobc, (yyvsp[0].string_value), 1);}
-#line 1298 "jsh.tab.c"
+#line 1300 "jsh.tab.c"
     break;
 
   case 30: /* $@6: %empty  */
-#line 172 "jsh.y"
+#line 174 "jsh.y"
                   { 
         if (output_redirection_used) {
             yyerror("Multiple output redirections not allowed");
@@ -1308,17 +1310,17 @@ yyreduce:
             printf(">> ");
         }
     }
-#line 1312 "jsh.tab.c"
+#line 1314 "jsh.tab.c"
     break;
 
   case 31: /* io_modifier: GREAT_GREAT $@6 WORD  */
-#line 180 "jsh.y"
+#line 182 "jsh.y"
            { printf("WORD=%s ", (yyvsp[0].string_value)); set_redirection(jt, jt->jobc, (yyvsp[0].string_value), 1);}
-#line 1318 "jsh.tab.c"
+#line 1320 "jsh.tab.c"
     break;
 
   case 32: /* $@7: %empty  */
-#line 181 "jsh.y"
+#line 183 "jsh.y"
                       { 
         if (output_redirection_used) {
             yyerror("Multiple output redirections not allowed");
@@ -1328,17 +1330,17 @@ yyreduce:
             printf(">>& ");
         }
     }
-#line 1332 "jsh.tab.c"
+#line 1334 "jsh.tab.c"
     break;
 
   case 33: /* io_modifier: GREAT_GREAT_AMP $@7 WORD  */
-#line 189 "jsh.y"
+#line 191 "jsh.y"
            { printf("WORD=%s ", (yyvsp[0].string_value)); set_redirection(jt, jt->jobc, (yyvsp[0].string_value), 1);}
-#line 1338 "jsh.tab.c"
+#line 1340 "jsh.tab.c"
     break;
 
   case 34: /* $@8: %empty  */
-#line 190 "jsh.y"
+#line 192 "jsh.y"
            { 
         if (input_redirection_used) {
             yyerror("Multiple input redirections not allowed");
@@ -1348,34 +1350,34 @@ yyreduce:
             printf("< ");
         }
     }
-#line 1352 "jsh.tab.c"
+#line 1354 "jsh.tab.c"
     break;
 
   case 35: /* io_modifier: LESS $@8 WORD  */
-#line 198 "jsh.y"
+#line 200 "jsh.y"
            { printf("WORD=%s ", (yyvsp[0].string_value)); set_redirection(jt, jt->jobc, (yyvsp[0].string_value), 0);}
-#line 1358 "jsh.tab.c"
+#line 1360 "jsh.tab.c"
     break;
 
   case 36: /* background_optional: AMP  */
-#line 204 "jsh.y"
+#line 206 "jsh.y"
     { 
         printf("AMP ");
         cur_proc_table->foreground = 0; 
     }
-#line 1367 "jsh.tab.c"
+#line 1369 "jsh.tab.c"
     break;
 
   case 37: /* background_optional: %empty  */
-#line 209 "jsh.y"
+#line 211 "jsh.y"
     {
         cur_proc_table->foreground = 1;
     }
-#line 1375 "jsh.tab.c"
+#line 1377 "jsh.tab.c"
     break;
 
 
-#line 1379 "jsh.tab.c"
+#line 1381 "jsh.tab.c"
 
       default: break;
     }
@@ -1568,7 +1570,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 213 "jsh.y"
+#line 215 "jsh.y"
 
 
 

@@ -21,7 +21,9 @@ void yyerror(char* string) {
 int input_redirection_used = 0;  // Flag for '<' redirection
 int output_redirection_used = 0; // Flag for '>', '>>', etc.
 
-static job_table* jt = NULL;
+job_table* jt = NULL;
+
+
 static proc_table* cur_proc_table = NULL;
 static proc* cur_proc = NULL;
 static char* cur_arg = NULL;
@@ -34,7 +36,7 @@ void print_word() {
     printf(" %s ", cur_proc->argv[cur_proc->argc]);
 }
 
-void print_table() {
+void print_table(job_table* jt) {
     printf("\nPRINTING RESULTING TABLE:\n");
     proc_table* pt;
     for (int i = 0; i < jt->jobc; i++) {
@@ -65,8 +67,8 @@ void print_table() {
 %%
 input: 
     input NEWLINE 
-    | before_input job_list
-    | NEWLINE// Empty
+    | before_input job_list 
+    | NEWLINE 
     ;
 
 before_input:
