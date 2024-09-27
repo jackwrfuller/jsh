@@ -42,7 +42,9 @@ job* parse_line(char* line) {
     
     job_table* jt;
     build_table(&jt, line);
-    print_table(jt);
+    if (jt) {
+        print_table(jt);
+    }
     free(jt);
     
     p = (process*) malloc(sizeof(process));

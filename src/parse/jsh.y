@@ -21,8 +21,6 @@ void yyerror(char* string) {
 int input_redirection_used = 0;  // Flag for '<' redirection
 int output_redirection_used = 0; // Flag for '>', '>>', etc.
 
-//job_table* jt = NULL;
-
 
 static proc_table* cur_proc_table = NULL;
 static proc* cur_proc = NULL;
@@ -39,8 +37,7 @@ void print_word() {
 %}
 
 %%
-input: 
-    input NEWLINE 
+input:  
     | before_input job_list 
     | NEWLINE 
     ;

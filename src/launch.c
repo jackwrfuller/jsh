@@ -238,10 +238,6 @@ void launch_job(job* j, int foreground) {
     pid_t pid;
     int mypipe[2], infile, outfile;
 
-
-
-
-
     infile = j->stdin;
     for (p = j->first_process; p; p = p->next) {
         // Set up pipes if necessary
