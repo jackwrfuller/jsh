@@ -6,6 +6,8 @@
 #include "jsh.tab.h"
 %}
 
+%option header="lexer.h"
+
 %%
 ";"                           { return SEMICOLON;         }
 \n                            { return NEWLINE;           }

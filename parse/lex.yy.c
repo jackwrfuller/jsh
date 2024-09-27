@@ -1,5 +1,5 @@
 
-#line 3 "lex.yy.c"
+#line 2 "lex.yy.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -451,8 +451,8 @@ char *yytext;
 #include <string.h>
 #include <stdio.h>
 #include "jsh.tab.h"
+#line 454 "lex.yy.c"
 #line 455 "lex.yy.c"
-#line 456 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -669,9 +669,9 @@ YY_DECL
 		}
 
 	{
-#line 9 "jsh.l"
+#line 11 "jsh.l"
 
-#line 675 "lex.yy.c"
+#line 674 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -730,66 +730,66 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 10 "jsh.l"
+#line 12 "jsh.l"
 { return SEMICOLON;         }
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 11 "jsh.l"
+#line 13 "jsh.l"
 { return NEWLINE;           }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 12 "jsh.l"
+#line 14 "jsh.l"
 {;                          }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 13 "jsh.l"
+#line 15 "jsh.l"
 { return GREAT;             }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 14 "jsh.l"
+#line 16 "jsh.l"
 { return LESS;              }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 15 "jsh.l"
+#line 17 "jsh.l"
 { return GREAT_GREAT;       }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 16 "jsh.l"
+#line 18 "jsh.l"
 { return GREAT_GREAT_AMP;   }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 17 "jsh.l"
+#line 19 "jsh.l"
 { return GREAT_AMP;         }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 18 "jsh.l"
+#line 20 "jsh.l"
 { return AMP;               }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 19 "jsh.l"
+#line 21 "jsh.l"
 { return PIPE;              }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 20 "jsh.l"
+#line 22 "jsh.l"
 { yylval.string_value = strdup(yytext); return WORD; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 21 "jsh.l"
+#line 23 "jsh.l"
 ECHO;
 	YY_BREAK
-#line 793 "lex.yy.c"
+#line 792 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1794,6 +1794,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 21 "jsh.l"
+#line 23 "jsh.l"
 
 

@@ -38,6 +38,7 @@ void print_table() {
     printf("\nPRINTING RESULTING TABLE:\n");
     proc_table* pt;
     for (int i = 0; i < jt->jobc; i++) {
+        printf("Job: %i\n", i);
         pt = &jt->jobs[i];
 
         proc* p;
@@ -52,6 +53,10 @@ void print_table() {
             printf(" | ");
         }
         printf("\n");
+        printf("Infile: %s\n", pt->infile);
+        printf("Outfile: %s\n", pt->outfile);
+        printf("Errfile: %s\n", pt->errfile);
+        printf("Foreground: %i\n", pt->foreground);
     }
 }
 
@@ -59,8 +64,9 @@ void print_table() {
 
 %%
 input: 
-    before_input job_list { print_table(); }
-    | // Empty
+    input NEWLINE 
+    | before_input job_list
+    | NEWLINE// Empty
     ;
 
 before_input:
@@ -85,8 +91,6 @@ afa:
     {
         jt->jobc += 1;
         printf("END JOB\n");
-        printf("Table at this point:\n");
-        print_table();
     }
     ;
 
@@ -125,31 +129,24 @@ apa:
 
 
 proc:
-    baa WORD { insert(jt, jt->jobc, cur_proc_table->procc, cur_proc->argc, $2); } aaa arg_list 
+    WORD { insert(jt, jt->jobc, cur_proc_table->procc, cur_proc->argc, $1); } aaa arg_list 
     ;
 
 arg_list:
-    baa WORD { insert(jt, jt->jobc, cur_proc_table->procc, cur_proc->argc, $2); } aaa arg_list 
+    WORD { insert(jt, jt->jobc, cur_proc_table->procc, cur_proc->argc, $1); } aaa arg_list 
     | // Empty
-    ;
-
-baa:
-    {
-        //cur_arg = cur_proc->argv[cur_proc->argc];
-    }
     ;
 
 aaa:
     {
         print_index();
         print_word();
-        cur_proc->argc += 1;
     }
     ;
 
 io_modifier_list:
-    io_modifier_list io_modifier
-    | // Empty
+    io_modifier io_modifier_list
+    |
     ;
 
 
@@ -162,7 +159,7 @@ io_modifier:
             output_redirection_used = 1;
             printf("> ");
         }
-    } WORD { printf("WORD=%s ", $3); }              
+    } WORD { printf("WORD=%s ", $3); set_redirection(jt, jt->jobc, $3, 1); } 
     | GREAT_AMP { 
         if (output_redirection_used) {
             yyerror("Multiple output redirections not allowed");
@@ -171,7 +168,7 @@ io_modifier:
             output_redirection_used = 1;
             printf(">& ");
         }
-    } WORD { printf("WORD=%s ", $3); }
+    } WORD { printf("WORD=%s ", $3); set_redirection(jt, jt->jobc, $3, 1);}
     | GREAT_GREAT { 
         if (output_redirection_used) {
             yyerror("Multiple output redirections not allowed");
@@ -180,7 +177,7 @@ io_modifier:
             output_redirection_used = 1;
             printf(">> ");
         }
-    } WORD { printf("WORD=%s ", $3); }
+    } WORD { printf("WORD=%s ", $3); set_redirection(jt, jt->jobc, $3, 1);}
     | GREAT_GREAT_AMP { 
         if (output_redirection_used) {
             yyerror("Multiple output redirections not allowed");
@@ -189,7 +186,7 @@ io_modifier:
             output_redirection_used = 1;
             printf(">>& ");
         }
-    } WORD { printf("WORD=%s ", $3); }
+    } WORD { printf("WORD=%s ", $3); set_redirection(jt, jt->jobc, $3, 1);}
     | LESS { 
         if (input_redirection_used) {
             yyerror("Multiple input redirections not allowed");
@@ -198,7 +195,7 @@ io_modifier:
             input_redirection_used = 1;
             printf("< ");
         }
-    } WORD { printf("WORD=%s ", $3); } 
+    } WORD { printf("WORD=%s ", $3); set_redirection(jt, jt->jobc, $3, 0);} 
     ;
 
 
@@ -216,8 +213,3 @@ background_optional:
 %%
 
 
-
-int main() {
-    yyparse();
-    return 0;
-}

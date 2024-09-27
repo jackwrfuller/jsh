@@ -1,0 +1,592 @@
+Grammar
+
+    0 $accept: input $end
+
+    1 input: input NEWLINE
+    2      | before_input job_list
+    3      | NEWLINE
+
+    4 before_input: ε
+
+    5 job_list: bja job_list_item afa job_list
+    6         | bja job_list_item afa
+
+    7 bja: ε
+
+    8 afa: ε
+
+    9 job_list_item: job SEMICOLON
+   10              | job NEWLINE
+
+   11 job: pipe_list io_modifier_list background_optional
+
+   12 $@1: ε
+
+   13 pipe_list: bpa proc apa PIPE $@1 pipe_list
+   14          | bpa proc apa
+
+   15 bpa: ε
+
+   16 apa: ε
+
+   17 $@2: ε
+
+   18 proc: WORD $@2 aaa arg_list
+
+   19 $@3: ε
+
+   20 arg_list: WORD $@3 aaa arg_list
+   21         | ε
+
+   22 aaa: ε
+
+   23 io_modifier_list: io_modifier io_modifier_list
+   24                 | ε
+
+   25 $@4: ε
+
+   26 io_modifier: GREAT $@4 WORD
+
+   27 $@5: ε
+
+   28 io_modifier: GREAT_AMP $@5 WORD
+
+   29 $@6: ε
+
+   30 io_modifier: GREAT_GREAT $@6 WORD
+
+   31 $@7: ε
+
+   32 io_modifier: GREAT_GREAT_AMP $@7 WORD
+
+   33 $@8: ε
+
+   34 io_modifier: LESS $@8 WORD
+
+   35 background_optional: AMP
+   36                    | ε
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    error (256)
+    WORD <string_value> (258) 18 20 26 28 30 32 34
+    SEMICOLON (259) 9
+    NEWLINE (260) 1 3 10
+    GREAT (261) 26
+    LESS (262) 34
+    AMP (263) 35
+    PIPE (264) 13
+    GREAT_AMP (265) 28
+    GREAT_GREAT (266) 30
+    GREAT_GREAT_AMP (267) 32
+
+
+Nonterminals, with rules where they appear
+
+    $accept (13)
+        on left: 0
+    input (14)
+        on left: 1 2 3
+        on right: 0 1
+    before_input (15)
+        on left: 4
+        on right: 2
+    job_list (16)
+        on left: 5 6
+        on right: 2 5
+    bja (17)
+        on left: 7
+        on right: 5 6
+    afa (18)
+        on left: 8
+        on right: 5 6
+    job_list_item (19)
+        on left: 9 10
+        on right: 5 6
+    job (20)
+        on left: 11
+        on right: 9 10
+    pipe_list (21)
+        on left: 13 14
+        on right: 11 13
+    $@1 (22)
+        on left: 12
+        on right: 13
+    bpa (23)
+        on left: 15
+        on right: 13 14
+    apa (24)
+        on left: 16
+        on right: 13 14
+    proc (25)
+        on left: 18
+        on right: 13 14
+    $@2 (26)
+        on left: 17
+        on right: 18
+    arg_list (27)
+        on left: 20 21
+        on right: 18 20
+    $@3 (28)
+        on left: 19
+        on right: 20
+    aaa (29)
+        on left: 22
+        on right: 18 20
+    io_modifier_list (30)
+        on left: 23 24
+        on right: 11 23
+    io_modifier (31)
+        on left: 26 28 30 32 34
+        on right: 23
+    $@4 (32)
+        on left: 25
+        on right: 26
+    $@5 (33)
+        on left: 27
+        on right: 28
+    $@6 (34)
+        on left: 29
+        on right: 30
+    $@7 (35)
+        on left: 31
+        on right: 32
+    $@8 (36)
+        on left: 33
+        on right: 34
+    background_optional (37)
+        on left: 35 36
+        on right: 11
+
+
+State 0
+
+    0 $accept: • input $end
+
+    NEWLINE  shift, and go to state 1
+
+    $default  reduce using rule 4 (before_input)
+
+    input         go to state 2
+    before_input  go to state 3
+
+
+State 1
+
+    3 input: NEWLINE •
+
+    $default  reduce using rule 3 (input)
+
+
+State 2
+
+    0 $accept: input • $end
+    1 input: input • NEWLINE
+
+    $end     shift, and go to state 4
+    NEWLINE  shift, and go to state 5
+
+
+State 3
+
+    2 input: before_input • job_list
+
+    $default  reduce using rule 7 (bja)
+
+    job_list  go to state 6
+    bja       go to state 7
+
+
+State 4
+
+    0 $accept: input $end •
+
+    $default  accept
+
+
+State 5
+
+    1 input: input NEWLINE •
+
+    $default  reduce using rule 1 (input)
+
+
+State 6
+
+    2 input: before_input job_list •
+
+    $default  reduce using rule 2 (input)
+
+
+State 7
+
+    5 job_list: bja • job_list_item afa job_list
+    6         | bja • job_list_item afa
+
+    $default  reduce using rule 15 (bpa)
+
+    job_list_item  go to state 8
+    job            go to state 9
+    pipe_list      go to state 10
+    bpa            go to state 11
+
+
+State 8
+
+    5 job_list: bja job_list_item • afa job_list
+    6         | bja job_list_item • afa
+
+    $default  reduce using rule 8 (afa)
+
+    afa  go to state 12
+
+
+State 9
+
+    9 job_list_item: job • SEMICOLON
+   10              | job • NEWLINE
+
+    SEMICOLON  shift, and go to state 13
+    NEWLINE    shift, and go to state 14
+
+
+State 10
+
+   11 job: pipe_list • io_modifier_list background_optional
+
+    GREAT            shift, and go to state 15
+    LESS             shift, and go to state 16
+    GREAT_AMP        shift, and go to state 17
+    GREAT_GREAT      shift, and go to state 18
+    GREAT_GREAT_AMP  shift, and go to state 19
+
+    $default  reduce using rule 24 (io_modifier_list)
+
+    io_modifier_list  go to state 20
+    io_modifier       go to state 21
+
+
+State 11
+
+   13 pipe_list: bpa • proc apa PIPE $@1 pipe_list
+   14          | bpa • proc apa
+
+    WORD  shift, and go to state 22
+
+    proc  go to state 23
+
+
+State 12
+
+    5 job_list: bja job_list_item afa • job_list
+    6         | bja job_list_item afa •
+
+    WORD      reduce using rule 7 (bja)
+    $default  reduce using rule 6 (job_list)
+
+    job_list  go to state 24
+    bja       go to state 7
+
+
+State 13
+
+    9 job_list_item: job SEMICOLON •
+
+    $default  reduce using rule 9 (job_list_item)
+
+
+State 14
+
+   10 job_list_item: job NEWLINE •
+
+    $default  reduce using rule 10 (job_list_item)
+
+
+State 15
+
+   26 io_modifier: GREAT • $@4 WORD
+
+    $default  reduce using rule 25 ($@4)
+
+    $@4  go to state 25
+
+
+State 16
+
+   34 io_modifier: LESS • $@8 WORD
+
+    $default  reduce using rule 33 ($@8)
+
+    $@8  go to state 26
+
+
+State 17
+
+   28 io_modifier: GREAT_AMP • $@5 WORD
+
+    $default  reduce using rule 27 ($@5)
+
+    $@5  go to state 27
+
+
+State 18
+
+   30 io_modifier: GREAT_GREAT • $@6 WORD
+
+    $default  reduce using rule 29 ($@6)
+
+    $@6  go to state 28
+
+
+State 19
+
+   32 io_modifier: GREAT_GREAT_AMP • $@7 WORD
+
+    $default  reduce using rule 31 ($@7)
+
+    $@7  go to state 29
+
+
+State 20
+
+   11 job: pipe_list io_modifier_list • background_optional
+
+    AMP  shift, and go to state 30
+
+    $default  reduce using rule 36 (background_optional)
+
+    background_optional  go to state 31
+
+
+State 21
+
+   23 io_modifier_list: io_modifier • io_modifier_list
+
+    GREAT            shift, and go to state 15
+    LESS             shift, and go to state 16
+    GREAT_AMP        shift, and go to state 17
+    GREAT_GREAT      shift, and go to state 18
+    GREAT_GREAT_AMP  shift, and go to state 19
+
+    $default  reduce using rule 24 (io_modifier_list)
+
+    io_modifier_list  go to state 32
+    io_modifier       go to state 21
+
+
+State 22
+
+   18 proc: WORD • $@2 aaa arg_list
+
+    $default  reduce using rule 17 ($@2)
+
+    $@2  go to state 33
+
+
+State 23
+
+   13 pipe_list: bpa proc • apa PIPE $@1 pipe_list
+   14          | bpa proc • apa
+
+    $default  reduce using rule 16 (apa)
+
+    apa  go to state 34
+
+
+State 24
+
+    5 job_list: bja job_list_item afa job_list •
+
+    $default  reduce using rule 5 (job_list)
+
+
+State 25
+
+   26 io_modifier: GREAT $@4 • WORD
+
+    WORD  shift, and go to state 35
+
+
+State 26
+
+   34 io_modifier: LESS $@8 • WORD
+
+    WORD  shift, and go to state 36
+
+
+State 27
+
+   28 io_modifier: GREAT_AMP $@5 • WORD
+
+    WORD  shift, and go to state 37
+
+
+State 28
+
+   30 io_modifier: GREAT_GREAT $@6 • WORD
+
+    WORD  shift, and go to state 38
+
+
+State 29
+
+   32 io_modifier: GREAT_GREAT_AMP $@7 • WORD
+
+    WORD  shift, and go to state 39
+
+
+State 30
+
+   35 background_optional: AMP •
+
+    $default  reduce using rule 35 (background_optional)
+
+
+State 31
+
+   11 job: pipe_list io_modifier_list background_optional •
+
+    $default  reduce using rule 11 (job)
+
+
+State 32
+
+   23 io_modifier_list: io_modifier io_modifier_list •
+
+    $default  reduce using rule 23 (io_modifier_list)
+
+
+State 33
+
+   18 proc: WORD $@2 • aaa arg_list
+
+    $default  reduce using rule 22 (aaa)
+
+    aaa  go to state 40
+
+
+State 34
+
+   13 pipe_list: bpa proc apa • PIPE $@1 pipe_list
+   14          | bpa proc apa •
+
+    PIPE  shift, and go to state 41
+
+    $default  reduce using rule 14 (pipe_list)
+
+
+State 35
+
+   26 io_modifier: GREAT $@4 WORD •
+
+    $default  reduce using rule 26 (io_modifier)
+
+
+State 36
+
+   34 io_modifier: LESS $@8 WORD •
+
+    $default  reduce using rule 34 (io_modifier)
+
+
+State 37
+
+   28 io_modifier: GREAT_AMP $@5 WORD •
+
+    $default  reduce using rule 28 (io_modifier)
+
+
+State 38
+
+   30 io_modifier: GREAT_GREAT $@6 WORD •
+
+    $default  reduce using rule 30 (io_modifier)
+
+
+State 39
+
+   32 io_modifier: GREAT_GREAT_AMP $@7 WORD •
+
+    $default  reduce using rule 32 (io_modifier)
+
+
+State 40
+
+   18 proc: WORD $@2 aaa • arg_list
+
+    WORD  shift, and go to state 42
+
+    $default  reduce using rule 21 (arg_list)
+
+    arg_list  go to state 43
+
+
+State 41
+
+   13 pipe_list: bpa proc apa PIPE • $@1 pipe_list
+
+    $default  reduce using rule 12 ($@1)
+
+    $@1  go to state 44
+
+
+State 42
+
+   20 arg_list: WORD • $@3 aaa arg_list
+
+    $default  reduce using rule 19 ($@3)
+
+    $@3  go to state 45
+
+
+State 43
+
+   18 proc: WORD $@2 aaa arg_list •
+
+    $default  reduce using rule 18 (proc)
+
+
+State 44
+
+   13 pipe_list: bpa proc apa PIPE $@1 • pipe_list
+
+    $default  reduce using rule 15 (bpa)
+
+    pipe_list  go to state 46
+    bpa        go to state 11
+
+
+State 45
+
+   20 arg_list: WORD $@3 • aaa arg_list
+
+    $default  reduce using rule 22 (aaa)
+
+    aaa  go to state 47
+
+
+State 46
+
+   13 pipe_list: bpa proc apa PIPE $@1 pipe_list •
+
+    $default  reduce using rule 13 (pipe_list)
+
+
+State 47
+
+   20 arg_list: WORD $@3 aaa • arg_list
+
+    WORD  shift, and go to state 42
+
+    $default  reduce using rule 21 (arg_list)
+
+    arg_list  go to state 48
+
+
+State 48
+
+   20 arg_list: WORD $@3 aaa arg_list •
+
+    $default  reduce using rule 20 (arg_list)
