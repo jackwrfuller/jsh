@@ -30,6 +30,10 @@ void print_index() {
     printf("(%i, %i, %i)", jt->jobc, cur_proc_table->procc, cur_proc->argc);
 }
 
+void print_word() {
+    printf(" %s ", cur_proc->argv[cur_proc->argc]);
+}
+
 void print_table() {
     printf("\nPRINTING RESULTING TABLE:\n");
     proc_table* pt;
@@ -81,6 +85,8 @@ afa:
     {
         jt->jobc += 1;
         printf("END JOB\n");
+        printf("Table at this point:\n");
+        print_table();
     }
     ;
 
@@ -119,36 +125,24 @@ apa:
 
 
 proc:
-    baa WORD 
-    { 
-        print_index(); 
-        printf(": \"%s\", ", $2);
-        cur_arg = strdup($2);
-        printf("WORD=%s ", cur_arg); 
-    } 
-    aaa arg_list 
+    baa WORD { insert(jt, jt->jobc, cur_proc_table->procc, cur_proc->argc, $2); } aaa arg_list 
     ;
 
 arg_list:
-    baa WORD 
-    { 
-        print_index(); 
-        printf(": \"%s\", ", $2);
-        cur_arg = strdup($2);
-        printf("WORD=%s ", cur_arg);  
-    } 
-    aaa arg_list 
+    baa WORD { insert(jt, jt->jobc, cur_proc_table->procc, cur_proc->argc, $2); } aaa arg_list 
     | // Empty
     ;
 
 baa:
     {
-        cur_arg = cur_proc->argv[cur_proc->argc];
+        //cur_arg = cur_proc->argv[cur_proc->argc];
     }
     ;
 
 aaa:
     {
+        print_index();
+        print_word();
         cur_proc->argc += 1;
     }
     ;
