@@ -1240,13 +1240,13 @@ yyreduce:
 
   case 18: /* $@2: %empty  */
 #line 134 "jsh.y"
-         { insert(jt, jt->jobc, cur_proc_table->procc, cur_proc->argc, (yyvsp[0].string_value)); }
+         { insert(jt, jt->jobc, cur_proc_table->procc, cur_proc->argc, (yyvsp[0].string_value)); free((yyvsp[0].string_value));}
 #line 1245 "jsh.tab.c"
     break;
 
   case 20: /* $@3: %empty  */
 #line 138 "jsh.y"
-         { insert(jt, jt->jobc, cur_proc_table->procc, cur_proc->argc, (yyvsp[0].string_value)); }
+         { insert(jt, jt->jobc, cur_proc_table->procc, cur_proc->argc, (yyvsp[0].string_value)); free((yyvsp[0].string_value)); }
 #line 1251 "jsh.tab.c"
     break;
 

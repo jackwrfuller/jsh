@@ -131,11 +131,11 @@ apa:
 
 
 proc:
-    WORD { insert(jt, jt->jobc, cur_proc_table->procc, cur_proc->argc, $1); } aaa arg_list 
+    WORD { insert(jt, jt->jobc, cur_proc_table->procc, cur_proc->argc, $1); free($1);} aaa arg_list 
     ;
 
 arg_list:
-    WORD { insert(jt, jt->jobc, cur_proc_table->procc, cur_proc->argc, $1); } aaa arg_list 
+    WORD { insert(jt, jt->jobc, cur_proc_table->procc, cur_proc->argc, $1); free($1); } aaa arg_list 
     | // Empty
     ;
 
