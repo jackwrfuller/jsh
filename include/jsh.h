@@ -1,6 +1,7 @@
 #ifndef JSH_H
 #define JSH_H
 
+#include <stdio.h>
 #include <sys/types.h>
 #include <termios.h>
 #include <stddef.h>
@@ -12,6 +13,19 @@
 
 #define IN_FOREGROUND 1
 
+/* Stevens Convention Wrappers */
+#define CHECK_ALLOC(ptr) \
+    if ((ptr) == NULL) { \
+        fprintf(stderr, "Memory allocation error at %s:%d\n", __FILE__, __LINE__); \
+        exit(EXIT_FAILURE); \
+    }
+
+/* Macro for wrapping malloc with error checking */
+#define Malloc(size) ({               \
+    void *ptr = malloc(size);         \
+    CHECK_ALLOC(ptr);                 \
+    ptr;                              \
+})
 
 typedef struct process {
     struct process* next;   /* next process in pipeline */ 

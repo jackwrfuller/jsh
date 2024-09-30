@@ -8,6 +8,13 @@
 
 job_table* jt;
 
+/*
+ * Construct and fill in a job_table struct by tokenizing and parsing a given
+ * input string.
+ * 
+ * Must call free on the given job_table pointer after calling, as yyparse()
+ * calls create_job_table(), which mallocs.
+ */
 void build_table(job_table** job_table, char* input) {
     YY_BUFFER_STATE buf = yy_scan_string(input);   
     
